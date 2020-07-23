@@ -1,16 +1,27 @@
 package de.schubert42.zeiterfassung;
 
-import io.undertow.Undertow;
-import io.undertow.util.Headers;
+import de.schubert42.zeiterfassung.web.TemplateEngine;
+import de.schubert42.zeiterfassung.web.Webserver;
+import freemarker.template.Configuration;
+import freemarker.template.TemplateExceptionHandler;
+
+import java.io.File;
+import java.io.IOException;
 
 public class Main {
     public static void main(String[] args) {
-        Undertow server = Undertow.builder().addHttpListener(8080,
-                "localhost").setHandler(exchange -> {
-            exchange.getResponseHeaders()
-                    .put(Headers.CONTENT_TYPE, "text/plain");
-            exchange.getResponseSender().send("Zeiterfassung");
-        }).build();
-        server.start();
+
+        String uhrzeit = "00:00:00 Uhr";
+        if (args.length > 0) {
+            uhrzeit = args[0];
+        }
+
+        try {
+            new Webserver("localhost", 8080, new TemplateEngine(), uhrzeit).starten();
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.exit(-1);
+        }
     }
+
 }
